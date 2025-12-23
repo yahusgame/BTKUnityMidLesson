@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,19 +9,22 @@ public class MovementManager : MonoBehaviour
     //private Rigidbody rb;
     //public float force = 10f;
     //public Transform target;
-    int counter = 0;
-    public Transform[] targets;
+    //int counter = 0;
+    //public Transform[] targets;
+    public float goingTime = 2f;
+    public Transform target;
 
     /*void Awake()
     {
         //rb = GetComponent<Rigidbody>();
-    }
+    }*/
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         // transform.position = new Vector3(5f, transform.position.y, transform.position.z);
-    }*/
+        StartCoroutine(MoveToTarget(target.position, goingTime));
+    }
 
     // Update is called once per frame
     void Update()
@@ -48,17 +52,17 @@ public class MovementManager : MonoBehaviour
 
         //Vector3.MoveTowards linearly interpolates between two points at a constant speed
         //transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
-        if (counter < targets.Length)
+        /* if (counter < targets.Length)
         {
             transform.position = Vector3.MoveTowards(transform.position, targets[counter].position, speed * Time.deltaTime);
             if (transform.position == targets[counter].position)
             {
                 counter++;
             }
-        }
+        } */
 
         //Vector3.Lerp linearly interpolates between two points based on a fraction (0 to 1)
-        /*if (counter<targets.Length)
+        /* if (counter<targets.Length)
         {
             transform.position = Vector3.Lerp(transform.position, targets[counter].position, 0.01f);
             if (Vector3.Distance(transform.position, targets[counter].position) < 0.1f)
@@ -66,5 +70,21 @@ public class MovementManager : MonoBehaviour
                 counter++;
             }
         }*/
+
+        // Using Coroutine to move smoothly over time
+        //we use coroutine to move to each target in sequence
+    }
+
+    private IEnumerator MoveToTarget(Vector3 targetPos, float time)
+    {
+        Vector3 startPos = transform.position;
+        float elapsedTime = 0f;
+        while (elapsedTime < time)
+        {
+            transform.position = Vector3.Lerp(startPos, targetPos, (elapsedTime / time));
+            elapsedTime += Time.deltaTime;
+            yield return null; // Wait for the next frame
+        }
+        transform.position = targetPos;
     }
 }
